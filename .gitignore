@@ -1,2 +1,3 @@
 manifest.py
+__pycache__/
 Extensions/__pycache__/
