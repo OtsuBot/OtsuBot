@@ -10,9 +10,9 @@ class Info(commands.Cog):
         welcome = "WELCOME TO GUILD MESSAGE"
         await guild.system_channel.send(welcome)
     
-    @commands.command(aliases = ["help", "commands", "information"],
-                      brief = "`info [optional: command]` - gives brief descrition about all the commands",
-                      description = "Gives a brief description about all the commands a user can access and basic information about the bot.")
+    @commands.command(brief = "`info [optional: command]` - gives brief descrition about all the commands",
+                      description = "Gives a brief description about all the commands a user can access and basic information about the bot.",
+                      aliases = ["help", "commands", "information"])
     async def info(self, ctx, command):
         try:
             command_obj = [i for i in self.bot.commands if i.name == command.lower()][0]

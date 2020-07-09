@@ -8,7 +8,7 @@ ctypes.windll.kernel32.SetConsoleTitleW(manifest.terminal_name)
 bot = commands.Bot(command_prefix = manifest.prefix)
 
 bot.remove_command("help")
-[bot.load_extension("Extensions." + extension) for extension in ["info", "credits", "gaming"]]
+[bot.load_extension("Extensions." + extension) for extension in ["info", "credits", "gaming", "mod"]]
 
 @bot.event
 async def on_ready():
