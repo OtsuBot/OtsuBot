@@ -1,4 +1,5 @@
 import sqlite3
+import json
 
 class Database():
     def __init__(self, path):
@@ -68,3 +69,34 @@ async def invalid_credit_amount(ctx, amount, messages):
         return True
     
     return False
+
+
+
+async def json_filter(string):
+    unicode_to_escape = {34: r"\"",
+                         10: r"\n",
+                         9: r"\t",
+                         92: r"\\",
+                         13: r"\r"}
+
+    return string.translate(unicode_to_escape)
+
+async def get_preferences_json(guild):
+    for x in [i for i in guild.text_channels if i.name == "otsu-preferences"]:
+        message = (await x.history(limit = 1, oldest_first = True).flatten())[0]
+
+        try:
+            preferences = json.loads(message.content)
+        except json.decoder.JSONDecodeError:
+            pass
+        else:
+            break
+
+    else:
+        await ctx.send("Make sure you have a preferences channel set up using the command `_setup new`.\nNote: the channel must be named 'otsu-preferences' to function.")
+        return
+    
+    return preferences, message
+
+async def escape_character_replace(string):
+    return string.replace(r"\"", "\"").replace(r"\n", "\n").replace(r"\t", "\t").replace(r"\\", "\\").replace(r"\r", "\r")

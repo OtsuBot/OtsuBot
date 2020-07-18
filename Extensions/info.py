@@ -2,8 +2,7 @@ from discord.ext import commands
 import discord
 
 class Info(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+    """ℹ|**to get back here**"""
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
@@ -15,7 +14,7 @@ class Info(commands.Cog):
                       aliases = ["help", "commands", "information"])
     async def info(self, ctx, command):
         try:
-            command_obj = [i for i in self.bot.commands if i.name == command.lower()][0]
+            command_obj = [i for i in Bot.commands if i.name == command.lower()][0]
         except KeyError:
             await ctx.send(f"The command {command.lower()} was not found.")
             return
@@ -29,37 +28,37 @@ class Info(commands.Cog):
     @info.error
     async def info_error(self, ctx, error):
         if type(error) == commands.errors.MissingRequiredArgument:
-            reactions = {"ℹ": "Info", "💰": "Credits", "🎮": "Gaming"}
-            
+            emoji_to_cog = {cog.__doc__[0]: cog for cog in Bot.cogs.values()}
             def check(reaction, user):
-                return user == ctx.author and str(reaction.emoji) in reactions
+                return user == ctx.author and str(reaction.emoji) in emoji_to_cog
             emoji = "ℹ"
             message = None
-
             while True:
                 embed = discord.Embed(title = "Information", description = "[Invite me to your server!](https://cutt.ly/otsu)\n<@713446074744045589> created by Elan\n[Join the official Otsu discord server!](https://cutt.ly/otsu_server)", color = 0x5b5f90)
                 embed.set_author(name = 'Otsu', icon_url = "https://cdn.discordapp.com/attachments/713434731999658034/713454423615209502/pixelskull.png")
                 if emoji == "ℹ":
-                    embed.add_field(name = "**How To Use**", value = "React with:\nℹ️ - **to get back here**\n\u200b", inline = False)
-                command_objs = self.bot.cogs[reactions[emoji]].get_commands()
-                embed.add_field(name = f"**{emoji} {reactions[emoji]}**", value = "\n".join([i.brief for i in command_objs]), inline = False)
+                    embed.add_field(name = "**How To Use**", value = f"React with:\n{chr(10).join([cog.__doc__.replace('|', ' - ') for cog in emoji_to_cog.values()])}\n\u200b", inline = False)
+                emoji_cog = emoji_to_cog[emoji]
+                embed.add_field(name = f"{emoji} {emoji_cog.__cog_name__}", value = "\n".join([i.brief for i in emoji_cog.get_commands()]), inline = False)
                 embed.set_footer(text = "Say _info [command name] to learn more about a command.", icon_url = "https://cdn2.iconfinder.com/data/icons/app-types-in-grey/512/info_512pxGREY.png")
                 if message == None:
                     message = await ctx.send(embed = embed)
                 else:
                     await message.edit(embed = embed)
-
-                for i in reactions:
-                    await message.add_reaction(i)
-
+                
+                for emoji in emoji_to_cog:
+                    await message.add_reaction(emoji)
+                
                 try:
-                    reaction, user = await self.bot.wait_for("reaction_add", timeout = 300.0, check = check)
+                    reaction, user = await Bot.wait_for("reaction_add", timeout = 300.0, check = check)
+
                 except:
                     return
 
                 await reaction.remove(user)
 
                 emoji = reaction.emoji
+
         else:
             raise error
 
@@ -71,7 +70,7 @@ class Info(commands.Cog):
     @commands.command(brief = "`suggest [suggestion]` -  suggest a new feature/bug/change",
                       description = "Sends a message to a channel in the official Otsu discord server with the suggestion.")
     async def suggest(self, ctx, *, suggestion):
-        await self.bot.get_channel(729099966169088031).send(f"{ctx.author.name}#{ctx.author.discriminator}\n{suggestion}")
+        await Bot.get_channel(729099966169088031).send(f"{ctx.author.name}#{ctx.author.discriminator}\n{suggestion}")
 
     @suggest.error
     async def suggest_error(self, ctx, error):
@@ -81,4 +80,6 @@ class Info(commands.Cog):
             raise error
 
 def setup(bot):
+    global Bot
+    Bot = bot
     bot.add_cog(Info(bot))

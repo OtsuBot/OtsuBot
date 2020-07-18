@@ -1,13 +1,11 @@
 from discord.ext import commands
 import discord
-import Extensions.functions as functs
+from Extensions import functions as functs
 import requests
 import random
 
 class Gaming(commands.Cog):
-    def __init__(self, bot, words):
-        self.bot = bot
-        self.words = words
+    """🎮|**to see game commands**"""
 
     @commands.command(brief = "`hangman [optional: bet]` - starts a game of hangman",
                       description = "Starts a game of hangman. The goal of the game is to guess letters until you know the word, then to either guess the word or finish guessing the letters. To play, type +c to guess the letter c and +cat to guess the word cat. If a bet is provided (a number), you will be rewarded that many credits if you guess the entire word. Otherwise, you lose that many credits. Saying 'open' after _hangman [bet] makes the game public, and anyone can guess using -c and -cat instead of +c and +cat.",
@@ -38,7 +36,7 @@ class Gaming(commands.Cog):
         definition = None
         while definition in [None, "ang="]:
             rand_num = random.randint(0, 209785)
-            word = self.words[rand_num:rand_num + 60]
+            word = Words[rand_num:rand_num + 60]
             word = word[word.find("\n") + 1:]
             word = word[:word.find("\n")]
 
@@ -68,7 +66,7 @@ class Gaming(commands.Cog):
         
         while True:
             try:
-                guess = await self.bot.wait_for("message", timeout = 300, check = check)
+                guess = await Bot.wait_for("message", timeout = 300, check = check)
 
             except:
                 exec(f"del hm_{ctx.author.id}", globals())
@@ -198,7 +196,7 @@ class Gaming(commands.Cog):
         definition = None
         while definition in [None, "ang="]:
             rand_num = random.randint(0, 209785)
-            word = self.words[rand_num:rand_num + 60]
+            word = Words[rand_num:rand_num + 60]
             word = word[word.find("\n") + 1:]
             word = word[:word.find("\n")]
 
@@ -228,7 +226,7 @@ class Gaming(commands.Cog):
 
         while True:
             try:
-                guess = await self.bot.wait_for("message", timeout = 300, check = check)
+                guess = await Bot.wait_for("message", timeout = 300, check = check)
 
             except:
                 exec(f"del hm_{ctx.author.id}", globals())
@@ -250,7 +248,7 @@ class Gaming(commands.Cog):
 
                 exec(f"del hm_{ctx.author.id}", globals())
                 return
-            
+
             else:
                 lives_message[-lives_message.count('❌') - 1] = '❌'
 
@@ -271,4 +269,8 @@ class Gaming(commands.Cog):
                 await ctx.send(embed = embed)
 
 def setup(bot):
-    bot.add_cog(Gaming(bot, requests.get("https://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain").text))
+    global Words
+    Words = requests.get("https://svnweb.freebsd.org/csrg/share/dict/Words?view=co&content-type=text/plain").text
+    global Bot
+    Bot = bot
+    bot.add_cog(Gaming())

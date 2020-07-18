@@ -1,10 +1,9 @@
 from discord.ext import commands
 import discord
-import Extensions.functions as functs
+from Extensions import functions as functs
 
 class Credits(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+    """💰|**to see credit moving comands**"""
 
     @commands.command(brief = "`daily` - collects a daily bonus",
                       description = "Awards 500 credits. This command has a 12 hour cooldown.")
@@ -180,4 +179,6 @@ class Credits(commands.Cog):
             raise error
 
 def setup(bot):
+    global Bot
+    Bot = bot
     bot.add_cog(Credits(bot))
